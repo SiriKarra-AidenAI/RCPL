@@ -1,0 +1,30 @@
+# Local dev infrastructure for the RCPL Spring Boot backend.
+#
+#   docker compose up -d          # start Oracle
+#   ./mvnw spring-boot:run        # (or `mvn spring-boot:run`) start the API on :8080
+#
+# Oracle Database Free is license-free for dev/CI. First boot takes a minute or two
+# while the database initialises; the healthcheck gates readiness.
+services:
+  oracle:
+    image: gvenzl/oracle-free:23-slim
+    container_name: rcpl-oracle
+    ports:
+      - "1521:1521"
+    environment:
+      # Password for SYS/SYSTEM. The app connects as the app user created below.
+      ORACLE_PASSWORD: oracle
+      # An application user + pluggable-database schema, created on first boot.
+      APP_USER: rcpl
+      APP_USER_PASSWORD: rcpl
+    volumes:
+      - rcpl-oracle-data:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+volumes:
+  rcpl-oracle-data:

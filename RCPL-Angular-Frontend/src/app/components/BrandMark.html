@@ -1,0 +1,10 @@
+@if (failed()) {
+  <span class="mark">R</span>
+} @else {
+  <img
+    class="{{ variant() === 'full' ? 'brand-img brand-img-full' : 'brand-img' }}"
+    src="/rcpl.png"
+    alt="Reliance Consumer Products Limited"
+    (error)="onError()"
+  />
+}
