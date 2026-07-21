@@ -88,4 +88,34 @@ public class Candidate {
     @Lob
     @Column(name = "discontinuation_form")
     private String discontinuationForm;
+
+    /** Null-safe accessor: avoids NPEs where callers sum/compare turnover figures. */
+    public BigDecimal getTurnoverMonthly() {
+        return turnoverMonthly != null ? turnoverMonthly : BigDecimal.ZERO;
+    }
+
+    /** Null-safe accessor: avoids NPEs where callers sum/compare turnover figures. */
+    public BigDecimal getExpectedRcplTurnover() {
+        return expectedRcplTurnover != null ? expectedRcplTurnover : BigDecimal.ZERO;
+    }
+
+    /** Null-safe accessor: avoids NPEs where callers sum/compare outlet counts. */
+    public Integer getCoverageOutlets() {
+        return coverageOutlets != null ? coverageOutlets : 0;
+    }
+
+    /** Null-safe accessor: avoids NPEs where callers sum/compare infra scores. */
+    public BigDecimal getInfraScore() {
+        return infraScore != null ? infraScore : BigDecimal.ZERO;
+    }
+
+    /** Null-safe accessor: avoids NPEs where callers sum/compare financial-eval percentages. */
+    public BigDecimal getFinEvalPct() {
+        return finEvalPct != null ? finEvalPct : BigDecimal.ZERO;
+    }
+
+    /** Null-safe accessor: avoids NPEs where callers sum/compare confidence percentages. */
+    public BigDecimal getConfidencePct() {
+        return confidencePct != null ? confidencePct : BigDecimal.ZERO;
+    }
 }
