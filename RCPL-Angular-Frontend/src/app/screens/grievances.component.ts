@@ -56,6 +56,11 @@ export class GrievancesComponent {
     return this.store.grievances().filter((g) => filter === 'all' || g.status === filter)
   })
 
+  // distinguishes "nothing exists yet" from "filter hid everything" so the template can
+  // render the right empty state instead of a blank table
+  protected readonly hasGrievances = computed(() => this.store.grievances().length > 0)
+  protected readonly noResultsForFilter = computed(() => this.hasGrievances() && this.rows().length === 0)
+
   protected readonly open = computed<Grievance | null>(() => {
     const openId = this.openId()
     return this.store.grievances().find((g) => g.id === openId) ?? null
