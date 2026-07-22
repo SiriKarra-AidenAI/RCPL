@@ -45,6 +45,8 @@ public class CandidateService {
 
     @Transactional
     public CandidateDto create(CurrentUser user, CreateCandidateRequest req) {
+        if (user == null) throw new ApiException.BadRequest("Current user is required");
+        if (req == null) throw new ApiException.BadRequest("Request body is required");
         Candidate c = new Candidate();
         c.setId(Ids.newId("c"));
         c.setName(req.name());
@@ -73,6 +75,7 @@ public class CandidateService {
 
     @Transactional
     public CandidateDto update(String id, UpdateCandidateRequest req) {
+        if (req == null) throw new ApiException.BadRequest("Request body is required");
         Candidate c = require(id);
         if (req.name() != null) c.setName(req.name());
         if (req.town() != null) c.setTown(req.town());
@@ -93,6 +96,7 @@ public class CandidateService {
 
     @Transactional
     public CandidateDto moveStage(String id, String stage) {
+        if (stage == null || stage.isBlank()) throw new ApiException.BadRequest("stage is required");
         Candidate c = require(id);
         c.setStage(stage);
         return toDto(candidateRepository.save(c));
@@ -101,6 +105,8 @@ public class CandidateService {
     /** Move to 'active' AND create/upsert the real Partner record (mirrors activateCandidate). */
     @Transactional
     public CandidateDto activate(CurrentUser user, String id, ActivateRequest req) {
+        if (user == null) throw new ApiException.BadRequest("Current user is required");
+        if (req == null) throw new ApiException.BadRequest("Request body is required");
         Candidate c = require(id);
         c.setStage("active");
         candidateRepository.save(c);
@@ -147,6 +153,7 @@ public class CandidateService {
     }
 
     private Candidate require(String id) {
+        if (id == null || id.isBlank()) throw new ApiException.BadRequest("Candidate id is required");
         return candidateRepository.findById(id)
                 .orElseThrow(() -> new ApiException.NotFound("Candidate not found: " + id));
     }
