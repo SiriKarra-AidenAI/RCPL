@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -29,8 +30,16 @@ public class PartnerTypeController {
     }
 
     @GetMapping
-    public List<PartnerTypeDto> list() {
-        return service.list();
+    public List<PartnerTypeDto> list(@RequestParam(required = false) String search) {
+        List<PartnerTypeDto> types = service.list();
+        if (search == null || search.isBlank()) {
+            return types;
+        }
+        String q = search.trim().toLowerCase();
+        return types.stream()
+                .filter(t -> (t.code() != null && t.code().toLowerCase().contains(q))
+                        || (t.name() != null && t.name().toLowerCase().contains(q)))
+                .toList();
     }
 
     @GetMapping("/{code}")
