@@ -44,7 +44,16 @@ public class GrievanceService {
 
     @Transactional(readOnly = true)
     public List<GrievanceDto> list() {
-        return grievanceRepo.findAll().stream().map(this::toDto).toList();
+        return list(null);
+    }
+
+    /** Grievances queue, optionally filtered by status tab so the screen can show a tab-specific empty state. */
+    @Transactional(readOnly = true)
+    public List<GrievanceDto> list(String status) {
+        return grievanceRepo.findAll().stream()
+                .filter(g -> status == null || status.isBlank() || status.equals(g.getStatus()))
+                .map(this::toDto)
+                .toList();
     }
 
     @Transactional(readOnly = true)
