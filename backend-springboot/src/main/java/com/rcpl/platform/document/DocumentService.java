@@ -9,6 +9,7 @@ import com.rcpl.platform.common.DateLabels;
 import com.rcpl.platform.common.Ids;
 import com.rcpl.platform.document.DocumentDtos.CreateDocumentRequest;
 import com.rcpl.platform.document.DocumentDtos.DocumentDto;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,16 @@ public class DocumentService {
 
     @Transactional
     public DocumentDto create(CreateDocumentRequest req) {
+        if (req == null) {
+            throw new ApiException.BadRequest("Document payload is required");
+        }
+        if (req.docName() == null || req.docName().isBlank()) {
+            throw new ApiException.BadRequest("Document name is required");
+        }
+        if (req.fileName() == null || req.fileName().isBlank()) {
+            throw new ApiException.BadRequest("Uploaded file name is required");
+        }
+
         SubmittedDocument d = new SubmittedDocument();
         d.setId(Ids.newId("doc"));
         d.setCaseCode(req.caseCode());
@@ -51,7 +62,13 @@ public class DocumentService {
         d.setUploadedOn(DateLabels.dateStamp());
         d.setOptional(req.optional());
         d.setThisWeek(true);
-        return DocumentDto.from(repository.save(d));
+
+        try {
+            return DocumentDto.from(repository.save(d));
+        } catch (DataAccessException e) {
+            throw new ApiException.Conflict("document_upload_failed",
+                    "Failed to save uploaded document '" + req.docName() + "': " + e.getMessage());
+        }
     }
 
     /**
