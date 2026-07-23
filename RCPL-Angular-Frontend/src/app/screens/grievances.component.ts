@@ -56,6 +56,22 @@ export class GrievancesComponent {
     return this.store.grievances().filter((g) => filter === 'all' || g.status === filter)
   })
 
+  // drives the empty-state placeholder in the template — distinguishes "nothing raised at all"
+  // from "nothing matches the selected tab" so the copy stays accurate either way.
+  protected readonly isEmpty = computed(() => this.rows().length === 0)
+
+  // true only when the store has zero grievances outright, regardless of the active tab —
+  // used so the empty-state copy doesn't imply grievances exist elsewhere when none do.
+  protected readonly hasNoGrievances = computed(() => this.store.grievances().length === 0)
+
+  protected readonly emptyMessage = computed(() => {
+    if (this.hasNoGrievances()) return 'No grievances raised yet.'
+    const filter = this.filter()
+    return filter === 'all'
+      ? 'No grievances raised yet.'
+      : `No ${this.tabLabel(filter).toLowerCase()} grievances.`
+  })
+
   protected readonly open = computed<Grievance | null>(() => {
     const openId = this.openId()
     return this.store.grievances().find((g) => g.id === openId) ?? null
@@ -94,6 +110,7 @@ export class GrievancesComponent {
   }
 
   protected openGrievance(id: string): void {
+    if (!this.store.grievances().some((g) => g.id === id)) return
     this.openId.set(id)
   }
 
